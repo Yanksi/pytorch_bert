@@ -8,6 +8,9 @@ from bert.dataset import IMDBBertDataset
 from bert.model import BERT
 from bert.trainer import BertTrainer
 
+import os
+import datetime
+
 BASE_DIR = Path(__file__).resolve().parent
 
 EMB_SIZE = 64
@@ -16,7 +19,9 @@ EPOCHS = 4
 BATCH_SIZE = 12
 NUM_HEADS = 4
 
-CHECKPOINT_DIR = BASE_DIR.joinpath('data/bert_checkpoints')
+curr_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+CHECKPOINT_DIR = BASE_DIR.joinpath(f'data/bert_checkpoints/{curr_time}')
+os.makedirs(CHECKPOINT_DIR, exist_ok=True)
 
 timestamp = datetime.datetime.utcnow().timestamp()
 LOG_DIR = BASE_DIR.joinpath(f'data/logs/bert_experiment_{timestamp}')
