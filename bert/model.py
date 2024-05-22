@@ -2,6 +2,7 @@ import torch
 
 from torch import nn
 import torch.nn.functional as f
+from .SparseLinear.linear import MyLinear, MySparseLinear, MyConnectedSparseLinearWrapper
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -49,6 +50,9 @@ class JointEmbedding(nn.Module):
         pos_tensor = torch.arange(dim, dtype=torch.long).to(device)
         return pos_tensor.expand_as(input_tensor)
 
+linear_modules = [MyLinear, MySparseLinear, MyConnectedSparseLinearWrapper(2)]
+Linear = linear_modules[2]
+
 
 class AttentionHead(nn.Module):
 
@@ -57,9 +61,9 @@ class AttentionHead(nn.Module):
 
         self.dim_inp = dim_inp
 
-        self.q = nn.Linear(dim_inp, dim_out)
-        self.k = nn.Linear(dim_inp, dim_out)
-        self.v = nn.Linear(dim_inp, dim_out)
+        self.q = Linear(dim_inp, dim_out)
+        self.k = Linear(dim_inp, dim_out)
+        self.v = Linear(dim_inp, dim_out)
 
     def forward(self, input_tensor: torch.Tensor, attention_mask: torch.Tensor = None):
         query, key, value = self.q(input_tensor), self.k(input_tensor), self.v(input_tensor)
