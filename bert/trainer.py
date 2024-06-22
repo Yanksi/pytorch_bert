@@ -114,7 +114,7 @@ class BertTrainer:
     def __call__(self):
         for self.current_epoch in range(self.current_epoch, self.epochs):
             loss = self.train(self.current_epoch)
-            self.save_checkpoint(self.current_epoch, step=-1, loss=loss)
+            # self.save_checkpoint(self.current_epoch, step=-1, loss=loss)
 
     def train(self, epoch: int):
         print(f"Begin epoch {epoch}")

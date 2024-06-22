@@ -14,10 +14,10 @@ import datetime
 BASE_DIR = Path(__file__).resolve().parent
 
 EMB_SIZE = 64
-HIDDEN_SIZE = 36
-EPOCHS = 4
-BATCH_SIZE = 12
-NUM_HEADS = 4
+HIDDEN_SIZE = 64
+EPOCHS = 20
+BATCH_SIZE = 64
+NUM_HEADS = 8
 
 curr_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 CHECKPOINT_DIR = BASE_DIR.joinpath(f'data/bert_checkpoints/{curr_time}')
@@ -45,7 +45,7 @@ if __name__ == '__main__':
         print_accuracy_every=200,
         batch_size=BATCH_SIZE,
         learning_rate=0.00007,
-        epochs=15
+        epochs=EPOCHS
     )
 
     trainer.print_summary()

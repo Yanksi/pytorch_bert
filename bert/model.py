@@ -2,7 +2,7 @@ import torch
 
 from torch import nn
 import torch.nn.functional as f
-from .SparseLinear.linear import MyLinear, MySparseLinear, MyConnectedSparseLinearWrapper
+from sparselinear import MyLinear, MySparseLinear, MyConnectedSparseLinear, linear_wrapper
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -16,7 +16,7 @@ class JointEmbedding(nn.Module):
         self.size = size
 
         self.token_emb = nn.Embedding(vocab_size, size)
-        self.segment_emb = nn.Embedding(vocab_size, size)
+        self.segment_emb = nn.Embedding(2, size)
 
         self.norm = nn.LayerNorm(size)
 
@@ -50,7 +50,10 @@ class JointEmbedding(nn.Module):
         pos_tensor = torch.arange(dim, dtype=torch.long).to(device)
         return pos_tensor.expand_as(input_tensor)
 
-linear_modules = [MyLinear, MySparseLinear, MyConnectedSparseLinearWrapper(2)]
+linear_modules = [
+    linear_wrapper(MyLinear, False),
+    linear_wrapper(MySparseLinear, False),
+    linear_wrapper(MyConnectedSparseLinear, False, 2, True)]
 Linear = linear_modules[2]
 
 
@@ -103,10 +106,10 @@ class Encoder(nn.Module):
 
         self.attention = MultiHeadAttention(attention_heads, dim_inp, dim_out)  # batch_size x sentence size x dim_inp
         self.feed_forward = nn.Sequential(
-            nn.Linear(dim_inp, dim_out),
+            Linear(dim_inp, dim_out),
             nn.Dropout(dropout),
             nn.GELU(),
-            nn.Linear(dim_out, dim_inp),
+            Linear(dim_out, dim_inp),
             nn.Dropout(dropout)
         )
         self.norm = nn.LayerNorm(dim_inp)
